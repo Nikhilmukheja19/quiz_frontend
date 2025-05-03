@@ -87,12 +87,18 @@ function WriteExam() {
     let totalSeconds = examData.duration;
     const intervalId = setInterval(() => {
       if (totalSeconds > 0) {
-        totalSeconds = totalSeconds - 1;
-        setSecondsLeft(totalSeconds);
+        totalSeconds -= 1;
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        setSecondsLeft({ hours, minutes, seconds });
       } else {
+        clearInterval(intervalId);
         setTimeUp(true);
       }
     }, 1000);
+
     setIntervalId(intervalId);
   };
 
