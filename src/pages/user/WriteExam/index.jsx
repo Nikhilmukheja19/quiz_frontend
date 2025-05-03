@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { message } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,10 +18,15 @@ function WriteExam() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [view, setView] = useState("instructions");
-  const [secondsLeft = 0, setSecondsLeft] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
   const [timeUp, setTimeUp] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
   const { user } = useSelector((state) => state.users);
+
   const getExamData = async () => {
     try {
       dispatch(ShowLoading());
@@ -31,7 +37,12 @@ function WriteExam() {
       if (response.success) {
         setQuestions(response.data.questions);
         setExamData(response.data);
-        setSecondsLeft(response.data.duration);
+        const totalSeconds = response.data.duration;
+        setSecondsLeft({
+          hours: Math.floor(totalSeconds / 3600),
+          minutes: Math.floor((totalSeconds % 3600) / 60),
+          seconds: totalSeconds % 60,
+        });
       } else {
         message.error(response.message);
       }
@@ -85,21 +96,20 @@ function WriteExam() {
 
   const startTimer = () => {
     let totalSeconds = examData.duration;
-    const intervalId = setInterval(() => {
+    const interval = setInterval(() => {
       if (totalSeconds > 0) {
         totalSeconds -= 1;
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
-
         setSecondsLeft({ hours, minutes, seconds });
       } else {
-        clearInterval(intervalId);
+        clearInterval(interval);
         setTimeUp(true);
       }
     }, 1000);
 
-    setIntervalId(intervalId);
+    setIntervalId(interval);
   };
 
   useEffect(() => {
@@ -114,6 +124,7 @@ function WriteExam() {
       getExamData();
     }
   }, []);
+
   return (
     examData && (
       <div className="mt-2">
@@ -138,7 +149,11 @@ function WriteExam() {
               </h1>
 
               <div className="timer">
-                <span className="text-2xl">{secondsLeft}</span>
+                <span className="text-2xl">
+                  {String(secondsLeft.hours).padStart(2, "0")}:
+                  {String(secondsLeft.minutes).padStart(2, "0")}:
+                  {String(secondsLeft.seconds).padStart(2, "0")}
+                </span>
               </div>
             </div>
 
@@ -212,11 +227,11 @@ function WriteExam() {
           <div className="flex  items-center mt-2 justify-center result">
             <div className="flex flex-col gap-2">
               <h1 className="text-2xl">RESULT</h1>
-               <div className="divider"></div>
+              <div className="divider"></div>
               <div className="marks">
                 <h1 className="text-md">Total Marks : {examData.totalMarks}</h1>
                 <h1 className="text-md">
-                  Obtained Marks :{result.correctAnswers.length}
+                  Obtained Marks : {result.correctAnswers.length}
                 </h1>
                 <h1 className="text-md">
                   Wrong Answers : {result.wrongAnswers.length}
@@ -233,7 +248,12 @@ function WriteExam() {
                       setView("instructions");
                       setSelectedQuestionIndex(0);
                       setSelectedOptions({});
-                      setSecondsLeft(examData.duration);
+                      const totalSeconds = examData.duration;
+                      setSecondsLeft({
+                        hours: Math.floor(totalSeconds / 3600),
+                        minutes: Math.floor((totalSeconds % 3600) / 60),
+                        seconds: totalSeconds % 60,
+                      });
                     }}
                   >
                     Retake Exam
@@ -280,11 +300,10 @@ function WriteExam() {
                 question.correctOption === selectedOptions[index];
               return (
                 <div
-                  className={`
-                  flex flex-col gap-1 p-2 ${
+                  className={`flex flex-col gap-1 p-2 ${
                     isCorrect ? "bg-success" : "bg-error"
-                  }
-                `}
+                  }`}
+                  key={index}
                 >
                   <h1 className="text-xl">
                     {index + 1} : {question.name}
@@ -316,7 +335,12 @@ function WriteExam() {
                   setView("instructions");
                   setSelectedQuestionIndex(0);
                   setSelectedOptions({});
-                  setSecondsLeft(examData.duration);
+                  const totalSeconds = examData.duration;
+                  setSecondsLeft({
+                    hours: Math.floor(totalSeconds / 3600),
+                    minutes: Math.floor((totalSeconds % 3600) / 60),
+                    seconds: totalSeconds % 60,
+                  });
                 }}
               >
                 Retake Exam
@@ -324,7 +348,7 @@ function WriteExam() {
             </div>
           </div>
         )}
-      </div> 
+      </div>
     )
   );
 }
