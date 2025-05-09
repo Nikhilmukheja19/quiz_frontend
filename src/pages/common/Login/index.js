@@ -26,12 +26,19 @@ function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen w-screen bg-primary">
+    <div
+      className="flex justify-center items-center h-screen w-screen bg-cover bg-center"
+      style={{
+        backgroundImage: 'url("https://www.transparenttextures.com/patterns/asfalt-dark.png")',
+        backgroundColor: "#e0f7ff", // fallback thin blue
+      }}
+    >
       <div className="card w-400 p-3 bg-white">
         <div className="flex flex-col">
           <div className="flex">
-            <h1 className="text-2xl">QUIZ - LOGIN <i class="ri-login-circle-line"></i></h1>
-            
+            <h1 className="text-2xl">
+              QUIZ - LOGIN <i className="ri-login-circle-line"></i>
+            </h1>
           </div>
           <div className="divider"></div>
           <Form layout="vertical" className="mt-2" onFinish={onFinish}>
